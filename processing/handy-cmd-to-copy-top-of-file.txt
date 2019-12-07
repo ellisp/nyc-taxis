@@ -1,0 +1,1 @@
+powershell -command "& {get-content raw-data/yellow_tripdata_2009-01.csv|select-object -first 1000}" >output.txt
