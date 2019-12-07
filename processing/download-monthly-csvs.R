@@ -6,6 +6,11 @@
 
 source("setup.R")
 
+# Download original CSVs. This is > 140GB of data so make sure you have disk space, and only do this
+# if you have unlimited internet downloads...
+#
+# Note that this will keep going forever (once everything successfully downloaded once)until you 
+# escape it, so it needs some supervision.
 while(TRUE){
   
   core_url <- "https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_YYYY-MM.csv"
