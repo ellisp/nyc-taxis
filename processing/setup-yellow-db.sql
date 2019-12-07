@@ -7,8 +7,7 @@ GO
 CREATE TABLE dbo.tripdata_log (
 	id INT IDENTITY PRIMARY KEY,
 	filename VARCHAR(255),
-	start_datetime DATETIME,
-	end_datetime DATETIME
+	start_datetime DATETIME DEFAULT GETDATE()
 )
 
 CREATE TABLE yellow.tripdata (
