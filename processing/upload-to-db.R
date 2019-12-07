@@ -1,3 +1,9 @@
+# This file deletes an old version of the database, sets up tables and uploads all the CSVs to the database.
+# Note that important point about deleting the old version.... I expect this to take a long time to run so
+# exercise caution.
+#
+# Peter Ellis
+
 source("setup.R")
 
 #
