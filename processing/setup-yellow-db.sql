@@ -10,6 +10,8 @@ CREATE TABLE dbo.tripdata_log (
 	start_datetime DATETIME DEFAULT GETDATE()
 )
 
+-- Note that starting in September 2010, end Lat and Long start to occasionally be NULL
+
 CREATE TABLE yellow.tripdata (
 	vendor_name				CHAR(3) NOT NULL,
 	trip_pickup_datetime	DATETIME NOT NULL,
@@ -20,8 +22,8 @@ CREATE TABLE yellow.tripdata (
 	start_lat				FLOAT NOT NULL,
 	rate_code				VARCHAR(63) NULL,
 	store_and_forward       VARCHAR(63) NULL,
-	end_lon					FLOAT NOT NULL,
-	end_lat					FLOAT NOT NULL,
+	end_lon					FLOAT NULL,
+	end_lat					FLOAT NULL,
 	payment_type			VARCHAR(63),
 	fare_amt				FLOAT NOT NULL,
 	surcharge				FLOAT NOT NULL,
