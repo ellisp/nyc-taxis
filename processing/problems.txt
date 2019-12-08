@@ -1,0 +1,73 @@
+
+
+
+
+
+
+[1] "bcp [nyc_taxi].[yellow].[tripdata] format nul -c -x -f C:\\Users\\Peter\\AppData\\Local\\Temp\\Rtmp6fIgxB\\filebd823441573 -t , -T -F 3 -b 1000000"
+[1] "bcp [nyc_taxi].[yellow].[tripdata] in raw-data/yellow_tripdata_2009-08.csv -f C:\\Users\\Peter\\AppData\\Local\\Temp\\Rtmp6fIgxB\\filebd823441573 -T -F 3 -b 1000000"
+
+Starting copy...
+1000000 rows sent to SQL Server. Total sent: 1000000
+1000000 rows sent to SQL Server. Total sent: 2000000
+1000000 rows sent to SQL Server. Total sent: 3000000
+1000000 rows sent to SQL Server. Total sent: 4000000
+1000000 rows sent to SQL Server. Total sent: 5000000
+1000000 rows sent to SQL Server. Total sent: 6000000
+1000000 rows sent to SQL Server. Total sent: 7000000
+1000000 rows sent to SQL Server. Total sent: 8000000
+1000000 rows sent to SQL Server. Total sent: 9000000
+1000000 rows sent to SQL Server. Total sent: 10000000
+1000000 rows sent to SQL Server. Total sent: 11000000
+1000000 rows sent to SQL Server. Total sent: 12000000
+SQLState = S1000, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Unexpected EOF encountered in BCP data-file
+
+
+
+
+
+
+
+
+
+
+
+
+[1] "bcp [nyc_taxi].[yellow].[tripdata] format nul -c -x -f C:\\Users\\Peter\\AppData\\Local\\Temp\\Rtmp6fIgxB\\filebd867136a3f -t , -T -F 3 -b 1000000"
+[1] "bcp [nyc_taxi].[yellow].[tripdata] in raw-data/yellow_tripdata_2010-02.csv -f C:\\Users\\Peter\\AppData\\Local\\Temp\\Rtmp6fIgxB\\filebd867136a3f -T -F 3 -b 1000000"
+
+Starting copy...
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+
+
+
+[1] "bcp [nyc_taxi].[yellow].[tripdata] format nul -c -x -f C:\\Users\\Peter\\AppData\\Local\\Temp\\Rtmp6fIgxB\\filebd870703cd -t , -T -F 3 -b 1000000"
+[1] "bcp [nyc_taxi].[yellow].[tripdata] in raw-data/yellow_tripdata_2010-03.csv -f C:\\Users\\Peter\\AppData\\Local\\Temp\\Rtmp6fIgxB\\filebd870703cd -T -F 3 -b 1000000"
+
+Starting copy...
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+1000000 rows sent to SQL Server. Total sent: 1000000
+1000000 rows sent to SQL Server. Total sent: 2000000
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+1000000 rows sent to SQL Server. Total sent: 3000000
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+
