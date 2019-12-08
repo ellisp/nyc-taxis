@@ -138,6 +138,51 @@ GO
 -- then use that for drawing plots
 
 
+-------------Arc distance---
+DROP FUNCTION IF EXISTS dbo.arc_distance
+GO
+/*
+	arc-distance in miles lat and lon of two points
+	@param @theta_1 starting longitude
+	@param @phi_1 starting latitude
+	@param @theta_2 ending longitude
+	@param @phi_2 ending latitude
+*/
+CREATE FUNCTION arc_distance(@theta_1 REAL, @phi_1 REAL, @theta_2 REAL, @phi_2 REAL)
+RETURNS REAL
+AS
+BEGIN
+	DECLARE @temp REAL
+	DECLARE @distance REAL
+
+	SET @temp = POWER(SIN(@theta_2 - @theta_1) /  2 * PI() / 180, 2) +
+	            COS(@theta_1 * PI() / 180) * COS(@theta_2 * PI() / 180.0) * 
+				  POWER(SIN((@phi_2 - @phi_1 ) / 2 * PI() / 180), 2)
+
+	SET @distance = 2 * ATN2(SQRT(@temp), SQRT(1 - @temp)) * 3958.8
+
+	RETURN(@distance)
+
+END
+GO
+
+WITH b AS
+	(SELECT top 10000
+		ROUND(trip_distance, 1) AS trip_distance, 
+		ROUND(dbo.arc_distance(start_lon, start_lat, end_lon, end_lat), 1) AS arc_distance
+	 FROM yellow.tripdata_filtered)
+SELECT
+	COUNT(1) AS freq,
+	trip_distance,
+	arc_distance
+FROM b
+GROUP BY 
+	trip_distance, 
+	arc_distance
+GO
+
+
+
 -------------------pickup by time of day-------------
 WITH a AS 
     (SELECT 
