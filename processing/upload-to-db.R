@@ -10,7 +10,7 @@ source("setup.R")
 # so you can resume uploading in case you get interrupted, or if you want to add some new months
 # of data at some point (in which case you don't need to uncomment that next line)
 #
-# execute_sql(nyc_taxi, "processing/setup-yellow-db.sql")
+execute_sql(nyc_taxi, "processing/setup-staging-db.sql")
 
 # Note that the first row of each file is the column headers, then there is a blank row, so
 # when we upload these we start at row 3
@@ -24,9 +24,16 @@ system.time({
     if(! f %in% already_done){
       sql <- paste0("INSERT INTO dbo.tripdata_log (filename) VALUES ('", f, "')")
       dbGetQuery(nyc_taxi, sql)
-      bcp("localhost", database = "nyc_taxi", schema = "yellow", table = "tripdata", 
-          file = f, 
-          delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 100")
+      
+      if(grepl("_2015-", f, fixed = TRUE)){
+        bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_later", 
+            file = f, 
+            delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 100") 
+      } else {
+        bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_early", 
+            file = f, 
+            delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 100")
+      }
     }
   
   }

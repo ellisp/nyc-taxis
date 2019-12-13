@@ -1,4 +1,23 @@
+# problem in 2010-03 has 1 bad between 0 and 1m, 1 bad between 2m and 3m, then numerous bad afeter 3m.
+f= files[15]
+j <- read_csv(f)
+# It looks like they come from fare_amount equality "Cas" rather than the expected number
 
+Warning: 11366 parsing failures.
+row         col   expected     actual                                   file
+2956 fare_amount a double   Cas        'raw-data/yellow_tripdata_2010-03.csv'
+2956 NA          18 columns 19 columns 'raw-data/yellow_tripdata_2010-03.csv'
+2093116 fare_amount a double   Cas        'raw-data/yellow_tripdata_2010-03.csv'
+2093116 NA          18 columns 19 columns 'raw-data/yellow_tripdata_2010-03.csv'
+3188014 fare_amount a double   Cas        'raw-data/yellow_tripdata_2010-03.csv'
+....... ........... .......... .......... ......................................
+See problems(...) for more details.
+
+
+
+
+
+At some point a new column "improvement_surcharge" appears
 
 
 
@@ -60,7 +79,7 @@ SQLState = 22005, NativeError = 0
 Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
 SQLState = 22005, NativeError = 0
 Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
-SQLState = 22005, NativeError = 0
+SQLState = 22005, NativeError 0= 0
 Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
 SQLState = 22005, NativeError = 0
 Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
