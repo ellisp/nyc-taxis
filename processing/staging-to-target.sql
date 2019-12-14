@@ -105,10 +105,10 @@ INSERT INTO dbo.tripdata(
 	tolls_amt,
 	total_amt
 )
-SELECT top 1000
+SELECT 
 	CASE
-		WHEN vendor_name = 1 THEN 'CMT'
-		WHEN vendor_name = 2 THEN 'VTS'
+		WHEN vendor_name = '1' THEN 'CMT'
+		WHEN vendor_name = '2' THEN 'VTS'
 		ELSE vendor_name
 	END,
 	trip_pickup_datetime,
@@ -168,10 +168,10 @@ INSERT INTO dbo.tripdata(
 	improvement_surcharge,
 	total_amt
 )
-SELECT top 1000
+SELECT 
     CASE
-		WHEN vendor_name = 1 THEN 'CMT'
-		WHEN vendor_name = 2 THEN 'VTS'
+		WHEN vendor_name = '1' THEN 'CMT'
+		WHEN vendor_name = '2' THEN 'VTS'
 		ELSE vendor_name
 	END,
 	trip_pickup_datetime,
