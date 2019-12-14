@@ -59,3 +59,6 @@ CREATE TABLE dbo.tripdata_later (
 	total_amt				FLOAT NOT NULL
 )
 
+-- 134 mb AND 19mb without indexing;    and 3.8GB with it
+CREATE CLUSTERED COLUMNSTORE INDEX ccx_st1 ON dbo.tripdata_early
+CREATE CLUSTERED COLUMNSTORE INDEX ccx_st2 ON dbo.tripdata_later
