@@ -1,3 +1,5 @@
+-- /processing/setup-staging-db.sql
+
 USE nyc_taxi
 
 DROP TABLE IF EXISTS dbo.tripdata_early
@@ -13,7 +15,7 @@ CREATE TABLE dbo.tripdata_log (
 
 -- Note that starting in September 2010, end Lat and Long start to occasionally be NULL
 
-CREATE TABLE dbo.tripdata_early (
+CREATE TABLE dbo.tripdata_0914 (
 	vendor_name				CHAR(3) NOT NULL,
 	trip_pickup_datetime	DATETIME NOT NULL,
 	trip_dropoff_datetime	DATETIME NOT NULL,
@@ -36,7 +38,7 @@ CREATE TABLE dbo.tripdata_early (
 )
 
 -- From 2015 onwards there is an extra column
-CREATE TABLE dbo.tripdata_later (
+CREATE TABLE dbo.tripdata_1516 (
 	vendor_name				CHAR(3) NOT NULL,
 	trip_pickup_datetime	DATETIME NOT NULL,
 	trip_dropoff_datetime	DATETIME NOT NULL,

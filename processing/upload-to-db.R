@@ -1,9 +1,9 @@
-# This file deletes an old version of the database, sets up tables and uploads all the CSVs to the database.
-# This takes about six minutes per month of data on my laptop
+# /processing/upload-to-db.R
+#
+# This file deletes an old version of the staging tables in the database, sets up tables and 
+# uploads all the CSVs to the database. This takes about six minutes per month of data on my laptop.
 #
 # Peter Ellis
-
-source("setup.R")
 
 # Only uncomment the next line if you want to wipe away the database (if it's already there) and start
 # from scratch. I've commented it out to avoid me doing this by mistake; the code below is written
@@ -26,11 +26,11 @@ system.time({
       dbGetQuery(nyc_taxi, sql)
       
       if(grepl("_2015-", f, fixed = TRUE)){
-        bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_later", 
+        bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_1516", 
             file = f, 
             delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 100") 
       } else {
-        bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_early", 
+        bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_0914", 
             file = f, 
             delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 100")
       }
