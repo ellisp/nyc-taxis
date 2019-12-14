@@ -6,11 +6,17 @@ which are eventually transferred to the yellow schema
 
 Peter Ellis 14 December 2019
 
-30 minutes for 670,000 writes with all the foreign keys on - will take forever at this rate...
-80 minutes for 2m writes with the foreign keys off - not much better
-Changed recovery model to "simple", increases the speed to 280,000 rows in 10 minutes - much better but still going to take 12 days at that rate.
-Removed the trip_id column so no longer has a primary key. Spped is similar, about 4 minutes for 100,000 rows
-Tried taking the columnstore index off. Note this will make the file size extremely large and may not work. But this is much faster, 2 minutes for 180,000 rows. Only 8 days work...
+13 million rows in 2 minutes with no foreign keys during upload, no datatype changes
+13 million rows in 8 minutes with foreign keys, no datatype changes
+2 million rows in 15 seconds, fk after upload, no datatype changes
+2 million rows in 18 seconds, fk after upload, 5 try_cast operations
+2 million rows in 18 seconds, fk after upload, 5 try_cast operations and 6 implicit cast
+13 million rows in 2 minutes, fk after upload, 5 try_cast operations 
+13 million rows in 2 minutes, fk after upload, 6 try_cast operations
+13 million rows in 2 minutes, fk after upload, 13 try_cast operations
+
+Note that some of the arithmetic overflow errors are from excessivley large negative figures eg -20m in the total fare.
+It is easy to forget this is possible when troubleshooting!
 */
 
 
@@ -83,19 +89,15 @@ CREATE TABLE dbo.tripdata (
 	end_lon					DECIMAL(9, 6) NULL,
 	end_lat					DECIMAL(9, 6) NULL,
 	payment_type_code   	TINYINT       NULL,
-	fare_amt				DECIMAL(9, 2) NULL,
-	surcharge				DECIMAL(9, 2) NULL,
-	mta_tax					DECIMAL(9, 2) NULL,
-	tip_amt					DECIMAL(9, 2) NULL,
-	tolls_amt				DECIMAL(9, 2) NULL,
-	improvement_surcharge   DECIMAL(9, 2) NULL,
+	fare_amt				DECIMAL(9, 2)  NULL,
+	surcharge				DECIMAL(9, 2)  NULL,
+	mta_tax					DECIMAL(9, 2)  NULL,
+	tip_amt					DECIMAL(9, 2)  NULL,
+	tolls_amt				DECIMAL(9, 2)  NULL,
+	improvement_surcharge   DECIMAL(9, 2)  NULL,
 	total_amt				DECIMAL(9, 2) NULL,
 
-	 CONSTRAINT pk_trips        PRIMARY KEY NONCLUSTERED (trip_id)
-	--CONSTRAINT fk_vendor       FOREIGN KEY (vendor_code) REFERENCES dbo.d_vendor_codes,
-	--CONSTRAINT fk_rate         FOREIGN KEY (rate_code) REFERENCES dbo.d_rate_codes,
-	--CONSTRAINT fk_store_fwd    FOREIGN KEY (store_and_forward_code) REFERENCES dbo.d_store_and_forward_codes,
-	--CONSTRAINT fk_payment_type FOREIGN KEY (payment_type_code) REFERENCES dbo.d_payment_type_codes
+	CONSTRAINT pk_trips        PRIMARY KEY NONCLUSTERED (trip_id)
 )
 
 CREATE CLUSTERED COLUMNSTORE INDEX ccx_yellow_trips ON dbo.tripdata
@@ -122,7 +124,7 @@ INSERT INTO dbo.tripdata(
 	tolls_amt,
 	total_amt
 )
-SELECT -- top 200000
+SELECT -- top 2000000
 	CASE
 		WHEN vendor_name = '1' THEN 'CMT'
 		WHEN vendor_name = '2' THEN 'VTS'
@@ -188,7 +190,7 @@ INSERT INTO dbo.tripdata(
 	improvement_surcharge,
 	total_amt
 )
-SELECT -- top 200000
+SELECT -- top 2000000
     CASE
 		WHEN vendor_name = '1' THEN 'CMT'
 		WHEN vendor_name = '2' THEN 'VTS'
@@ -219,16 +221,21 @@ SELECT -- top 200000
 		WHEN payment_type In ('voided trip', 'voi', 'voided', '6') THEN 6
 		ELSE NULL
 	END,
-	TRY_CAST(fare_amt AS DECIMAL(9, 2)),
+    TRY_CAST(fare_amt AS DECIMAL(9, 2)),
 	TRY_CAST(surcharge AS DECIMAL(9, 2)),
 	TRY_CAST(mta_tax AS DECIMAL(9, 2)),
 	TRY_CAST(tip_amt AS DECIMAL(9, 2)),
 	TRY_CAST(tolls_amt AS DECIMAL(9, 2)),
-	TRY_CAST(improvement_surcharge AS DECIMAL(9, 2)),
+    TRY_CAST(improvement_surcharge AS DECIMAL(9, 2)),
 	TRY_CAST(total_amt AS DECIMAL(9, 2))
 FROM dbo.tripdata_1516
 
 ------------------Updates--------------
+
+ALTER TABLE dbo.tripdata ADD CONSTRAINT fk_vendor       FOREIGN KEY (vendor_code) REFERENCES dbo.d_vendor_codes
+ALTER TABLE dbo.tripdata ADD 	CONSTRAINT fk_rate         FOREIGN KEY (rate_code) REFERENCES dbo.d_rate_codes
+ALTER TABLE dbo.tripdata ADD CONSTRAINT fk_store_fwd    FOREIGN KEY (store_and_forward_code) REFERENCES dbo.d_store_and_forward_codes
+ALTER TABLE dbo.tripdata ADD CONSTRAINT fk_payment_type FOREIGN KEY (payment_type_code) REFERENCES dbo.d_payment_type_codes
 
 UPDATE dbo.tripdata SET start_lon = NULL, start_lat = NULL WHERE ABS(start_lon) > 180
 UPDATE dbo.tripdata SET end_lon = NULL, end_lat = NULL WHERE ABS(end_lon) > 180
@@ -242,7 +249,7 @@ UPDATE dbo.tripdata SET tip_amt = NULL WHERE tip_amt < 0
 UPDATE dbo.tripdata SET improvement_surcharge = NULL WHERE improvement_surcharge < 0
 UPDATE dbo.tripdata SET total_amt = NULL WHERE total_amt < 0
 
-
+ALTER INDEX ccx_yellow_trips ON dbo.tripdata REORGANIZE with (COMPRESS_ALL_ROW_GROUPS = ON)  
 ----------------Transfer-------------------------
 -- if everything works can now transfer over to the production databases and drop the temporary versions of the data
 DROP TABLE IF EXISTS yellow.tripdata

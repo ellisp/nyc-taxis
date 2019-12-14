@@ -1,3 +1,25 @@
+# 2010-02
+[1] "bcp [nyc_taxi].[dbo].[tripdata_early] format nul -c -x -f C:\\Users\\Peter\\AppData\\Local\\Temp\\RtmpkzgCTZ\\file3a406e2f3dc4 -t , -T -F 3 -b 1000000 -m 100"
+[1] "bcp [nyc_taxi].[dbo].[tripdata_early] in raw-data/yellow_tripdata_2010-02.csv -f C:\\Users\\Peter\\AppData\\Local\\Temp\\RtmpkzgCTZ\\file3a406e2f3dc4 -T -F 3 -b 1000000 -m 100"
+
+Starting copy...
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+1000000 rows sent to SQL Server. Total sent: 1000000
+1000000 rows sent to SQL Server. Total sent: 2000000
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+1000000 rows sent to SQL Server. Total sent: 3000000
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+SQLState = 22005, NativeError = 0
+Error = [Microsoft][ODBC Driver 17 for SQL Server]Invalid character value for cast specification
+
+
+
+
 # problem in 2010-03 has 1 bad between 0 and 1m, 1 bad between 2m and 3m, then numerous bad afeter 3m.
 f= files[15]
 j <- read_csv(f)

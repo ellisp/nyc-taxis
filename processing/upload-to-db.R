@@ -15,7 +15,8 @@ execute_sql(nyc_taxi, "processing/setup-staging-db.sql")
 # Note that the first row of each file is the column headers, then there is a blank row, so
 # when we upload these we start at row 3
 
-# The -m 100 means it will skip up to 100 bad rows
+# The -m 4000 means it will skip up to 4000 bad rows which is enough for the 2010 files that have
+# bad extra columns in them. There are 11,366/2 such failures in 2010-03 and 2,225/2 in 2010-02
 
 system.time({
   files <- list.files("raw-data", pattern = "yellow.*\\.csv", full.names = TRUE)
@@ -28,11 +29,11 @@ system.time({
       if(grepl("_2015-", f, fixed = TRUE)){
         bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_1516", 
             file = f, 
-            delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 100") 
+            delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 6000") 
       } else {
         bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_0914", 
             file = f, 
-            delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 100")
+            delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 6000")
       }
     }
   

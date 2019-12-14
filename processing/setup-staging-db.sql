@@ -2,8 +2,8 @@
 
 USE nyc_taxi
 
-DROP TABLE IF EXISTS dbo.tripdata_early
-DROP TABLE IF EXISTS dbo.tripdata_later
+DROP TABLE IF EXISTS dbo.tripdata_0914
+DROP TABLE IF EXISTS dbo.tripdata_1516
 DROP TABLE IF EXISTS dbo.tripdata_log
 GO
 
@@ -29,7 +29,7 @@ CREATE TABLE dbo.tripdata_0914 (
 	end_lat					FLOAT NULL,
 	-- in 2010 they start coding cash as "Cas" rather than a number so we need to allow strings here:
 	payment_type			VARCHAR(63),
-	fare_amt				VARCHAR(63),
+	fare_amt				FLOAT NOT NULL,
 	surcharge				FLOAT NOT NULL,
 	mta_tax					FLOAT NULL,
 	tip_amt					FLOAT NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE dbo.tripdata_1516 (
 	end_lat					FLOAT NULL,
 	-- in 2010 they start coding cash as "Cas" rather than a number so we need to allow strings here:
 	payment_type			VARCHAR(63),
-	fare_amt				VARCHAR(63),
+	fare_amt				FLOAT NOT NULL,
 	surcharge				FLOAT NOT NULL,
 	mta_tax					FLOAT NULL,
 	tip_amt					FLOAT NOT NULL,
@@ -62,5 +62,5 @@ CREATE TABLE dbo.tripdata_1516 (
 )
 
 -- 134 mb AND 19mb without indexing;    and 3.8GB with it
-CREATE CLUSTERED COLUMNSTORE INDEX ccx_st1 ON dbo.tripdata_early
-CREATE CLUSTERED COLUMNSTORE INDEX ccx_st2 ON dbo.tripdata_later
+CREATE CLUSTERED COLUMNSTORE INDEX ccx_st1 ON dbo.tripdata_0914
+CREATE CLUSTERED COLUMNSTORE INDEX ccx_st2 ON dbo.tripdata_1516
