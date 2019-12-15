@@ -78,7 +78,8 @@ CREATE TABLE dbo.tripdata_1619 (
 	tip_amt					FLOAT NOT NULL,
 	tolls_amt				FLOAT NOT NULL,
 	improvement_surcharge   FLOAT NULL,
-	total_amt				FLOAT NOT NULL
+	total_amt				FLOAT NOT NULL,
+	congestion_surcharge    FLOAT NOT NULL
 )
 
 

@@ -42,3 +42,4 @@ vignettes/*.pdf
 
 *.csv
 *.png
+processing/*.txt

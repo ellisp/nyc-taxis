@@ -10,7 +10,7 @@
 # so you can resume uploading in case you get interrupted, or if you want to add some new months
 # of data at some point (in which case you don't need to uncomment that next line)
 #
-execute_sql(nyc_taxi, "processing/setup-staging-db.sql")
+# execute_sql(nyc_taxi, "processing/setup-staging-db.sql")
 
 # Note that the first row of each file is the column headers, then there is a blank row, so
 # when we upload these we start at row 3
@@ -47,10 +47,12 @@ system.time({
 })
 
 
+x <- read_csv(f, n_max = 1e4)
+na
 
-# source("processing/one-off-setup-target.R")
+source("processing/one-off-setup-target.R")
 
 # I expect this next script to take quite a few hours to run, so rather than uncommenting it
 # you might prefer to do it in Management Studio
-# execute_sql(nyc_taxi, "processing/staging-to-target.sql")
+execute_sql(nyc_taxi, "processing/staging-to-target.sql")
 

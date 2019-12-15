@@ -9,12 +9,11 @@ source("setup.R")
 # Download original CSVs. This is > 140GB of data so make sure you have disk space, and only do this
 # if you have unlimited internet downloads...
 #
-# Note that this will keep going forever (once everything successfully downloaded once)until you 
-# escape it, so it needs some supervision.
-while(TRUE){
+# Note that this will keep going for 10 tries of the whole cycle if it missed some things on the first round.
+for(i in 1:10){
   
   core_url <- "https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_YYYY-MM.csv"
-  all_years <- 2015:2019
+  all_years <- 2009:2015
   all_months <- str_pad(1:12, 2, "left", pad = "0")
   
   for(y in all_years){

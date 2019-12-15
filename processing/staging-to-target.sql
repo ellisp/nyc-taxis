@@ -180,6 +180,7 @@ INSERT INTO yellow.tripdata(
 	tolls_amt,
 	improvement_surcharge,
 	total_amt,
+	congestion_surcharge,
 	pickup_zone_code,
 	dropoff_zone_code
 )
@@ -217,6 +218,7 @@ SELECT --top 4000000
 	TRY_CAST(tolls_amt AS DECIMAL(9, 2)),
     TRY_CAST(improvement_surcharge AS DECIMAL(9, 2)),
 	TRY_CAST(total_amt AS DECIMAL(9, 2)),
+	TRY_CAST(congestion_surcharge AS DECIMAL(9, 2)),
 	pu_location_id,
 	do_location_id
 FROM dbo.tripdata_1619
@@ -239,6 +241,7 @@ UPDATE yellow.tripdata SET extra = NULL WHERE extra < 0
 UPDATE yellow.tripdata SET tip_amt = NULL WHERE tip_amt < 0
 UPDATE yellow.tripdata SET improvement_surcharge = NULL WHERE improvement_surcharge < 0
 UPDATE yellow.tripdata SET total_amt = NULL WHERE total_amt <= 0
+UPDATE yellow.tripdata SET congestion_surcharge = NULL WHERE congestion_surcharge <= 0
 
 -- Reorganise the columnstore index
 ALTER INDEX ccx_yellow_trips ON yellow.tripdata REORGANIZE with (COMPRESS_ALL_ROW_GROUPS = ON)  

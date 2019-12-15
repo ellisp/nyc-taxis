@@ -83,6 +83,7 @@ CREATE TABLE yellow.tripdata (
 	tolls_amt				DECIMAL(9, 2)  NULL,
 	improvement_surcharge   DECIMAL(9, 2)  NULL,
 	total_amt				DECIMAL(9, 2) NULL,
+	congestion_surcharge	DECIMAL(9, 2) NULL,
 	pickup_zone_code        SMALLINT      NULL,
 	dropoff_zone_code       SMALLINT      NULL
 
