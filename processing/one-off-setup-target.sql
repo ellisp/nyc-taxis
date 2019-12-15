@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS yellow.d_vendor_codes
 DROP TABLE IF EXISTS yellow.d_rate_codes
 DROP TABLE IF EXISTS yellow.d_store_and_forward_codes
 DROP TABLE IF EXISTS yellow.d_payment_type_codes
+DROP TABLE IF EXISTS yellow.d_taxi_zone_codes
 
 -- Target dimension tables
 
@@ -53,6 +54,13 @@ INSERT INTO yellow.d_payment_type_codes VALUES
 	(6, 'Voided trip')
 
 
+CREATE TABLE yellow.d_taxi_zone_codes (
+	location_code SMALLINT PRIMARY KEY,
+	borough        NVARCHAR(255) ,
+	zone           NVARCHAR(255),
+	service_zone   NVARCHAR(255)
+)
+
 -- Target main table
 CREATE TABLE yellow.tripdata (
     trip_id                 BIGINT IDENTITY,
@@ -69,7 +77,7 @@ CREATE TABLE yellow.tripdata (
 	end_lat					DECIMAL(9, 6) NULL,
 	payment_type_code   	TINYINT       NULL,
 	fare_amt				DECIMAL(9, 2)  NULL,
-	surcharge				DECIMAL(9, 2)  NULL,
+	extra    				DECIMAL(9, 2)  NULL,
 	mta_tax					DECIMAL(9, 2)  NULL,
 	tip_amt					DECIMAL(9, 2)  NULL,
 	tolls_amt				DECIMAL(9, 2)  NULL,
@@ -84,9 +92,18 @@ CREATE TABLE yellow.tripdata (
 CREATE CLUSTERED COLUMNSTORE INDEX ccx_yellow_trips ON yellow.tripdata
 
 -- make foreign keys. Note that these will be dropped while adding data, but nice to have them here for completeness--
--- TODO Ideally this should be done with a stored procedure rather than have identical code in two scripts
-ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_vendor       FOREIGN KEY (vendor_code) REFERENCES yellow.d_vendor_codes
-ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_rate         FOREIGN KEY (rate_code) REFERENCES yellow.d_rate_codes
-ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_store_fwd    FOREIGN KEY (store_and_forward_code) REFERENCES yellow.d_store_and_forward_codes
-ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_payment_type FOREIGN KEY (payment_type_code) REFERENCES yellow.d_payment_type_codes
+-- We make a stored procedure to do this so we can use it again later without repeating code.
+DROP PROCEDURE IF EXISTS dbo.make_yellow_keys
+GO
 
+CREATE PROCEDURE dbo.make_yellow_keys 
+AS
+	ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_vendor       FOREIGN KEY (vendor_code) REFERENCES yellow.d_vendor_codes
+	ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_rate         FOREIGN KEY (rate_code) REFERENCES yellow.d_rate_codes
+	ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_store_fwd    FOREIGN KEY (store_and_forward_code) REFERENCES yellow.d_store_and_forward_codes
+	ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_payment_type FOREIGN KEY (payment_type_code) REFERENCES yellow.d_payment_type_codes
+	ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_pickup_zone FOREIGN KEY (pickup_zone_code) REFERENCES yellow.d_taxi_zone_codes
+	ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_dropoff_zone FOREIGN KEY (dropoff_zone_code) REFERENCES yellow.d_taxi_zone_codes
+GO
+
+EXECUTE dbo.make_yellow_keys

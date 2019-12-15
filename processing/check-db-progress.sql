@@ -3,6 +3,8 @@ select * from dbo.tripdata_log order by id desc
 select '0914' AS years, count(1) / 1000000 AS 'Million rows' from dbo.tripdata_0914
 union
 select '1516' AS years, count(1) / 1000000 AS 'Million rows' from dbo.tripdata_1516
+union
+select '1619' AS years, count(1) / 1000000 AS 'Million rows' from dbo.tripdata_1619
 
 /*
 SELECT
