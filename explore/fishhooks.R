@@ -6,11 +6,13 @@ x <- read_csv(files[83], n_max = 1e5)
 y <- read_csv(files[15], n_max = 1e5)
 z <- read_csv(files[1], n_max = 1e5)
 
-f= files[15]
+f= files[14]
+m <- read_csv(f)
 
 dim(x)
 dim(y)
 dim(z)
+dim(m)
 
 x
 View(x)

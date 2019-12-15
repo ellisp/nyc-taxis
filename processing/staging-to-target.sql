@@ -19,92 +19,17 @@ Note that some of the arithmetic overflow errors are from excessivley large nega
 It is easy to forget this is possible when troubleshooting!
 */
 
-
-DROP TABLE IF EXISTS dbo.tripdata
-DROP TABLE IF EXISTS dbo.d_vendor_codes
-DROP TABLE IF EXISTS dbo.d_rate_codes
-DROP TABLE IF EXISTS dbo.d_store_and_forward_codes
-DROP TABLE IF EXISTS dbo.d_payment_type_codes
-
--- Target dimension tables
-
-CREATE TABLE dbo.d_vendor_codes (
-	vendor_code CHAR(3) PRIMARY KEY,
-	vendor_name VARCHAR(63) UNIQUE
-)
-
-INSERT INTO dbo.d_vendor_codes VALUES
-	('CMT', 'Creative MObile Technologies, LLC'),
-	('VTS', 'VeriFone Inc.'),
-	('DDS', 'DDS')
+-- Drop foreign key constraints so can do everything faster:
+ALTER TABLE yellow.tripdata DROP CONSTRAINT fk_vendor
+ALTER TABLE yellow.tripdata DROP CONSTRAINT fk_rate
+ALTER TABLE yellow.tripdata DROP CONSTRAINT fk_store_fwd
+ALTER TABLE yellow.tripdata DROP CONSTRAINT fk_payment_type
 
 
-CREATE TABLE dbo.d_rate_codes (
-	rate_code TINYINT PRIMARY KEY,
-	rate_description VARCHAR(63) NOT NULL UNIQUE
-)
-INSERT INTO dbo.d_rate_codes VALUES
-	(1, 'Standard rate'),
-	(2, 'JFK'),
-	(3, 'Newark'),
-	(4, 'Nassau or Westchester'),
-	(5, 'Negotiated fare'),
-	(6, 'Group ride')
-
-CREATE TABLE dbo.d_store_and_forward_codes (
-	store_and_forward_code CHAR(1) PRIMARY KEY,
-	store_and_forward VARCHAR(63) UNIQUE
-)
-
-INSERT INTO dbo.d_store_and_forward_codes VALUES
-	('Y', 'Store and forward trip'),
-	('N', 'Not a store and forward trip')
-
-CREATE TABLE dbo.d_payment_type_codes (
-	payment_type_code TINYINT PRIMARY KEY,
-	payment_type VARCHAR(63) UNIQUE
-)
-
-INSERT INTO dbo.d_payment_type_codes VALUES
-	(1, 'Credit card'),
-	(2, 'Cash'),
-	(3, 'No charge'),
-	(4, 'Dispute'),
-	(5, 'Unknown'),
-	(6, 'Voided trip')
-
-
--- Target main table
-CREATE TABLE dbo.tripdata (
-    trip_id                 BIGINT IDENTITY,
-	vendor_code				CHAR(3)       NOT NULL,
-	trip_pickup_datetime	DATETIME      NOT NULL,
-	trip_dropoff_datetime	DATETIME      NOT NULL,
-	passenger_count			TINYINT       NULL,
-	trip_distance			DECIMAL(9, 4) NULL,
-	start_lon				DECIMAL(9, 6) NULL,
-	start_lat				DECIMAL(9, 6) NULL,
-	rate_code				TINYINT       NULL,
-	store_and_forward_code  CHAR(1)       NULL,
-	end_lon					DECIMAL(9, 6) NULL,
-	end_lat					DECIMAL(9, 6) NULL,
-	payment_type_code   	TINYINT       NULL,
-	fare_amt				DECIMAL(9, 2)  NULL,
-	surcharge				DECIMAL(9, 2)  NULL,
-	mta_tax					DECIMAL(9, 2)  NULL,
-	tip_amt					DECIMAL(9, 2)  NULL,
-	tolls_amt				DECIMAL(9, 2)  NULL,
-	improvement_surcharge   DECIMAL(9, 2)  NULL,
-	total_amt				DECIMAL(9, 2) NULL,
-
-	CONSTRAINT pk_trips        PRIMARY KEY NONCLUSTERED (trip_id)
-)
-
-CREATE CLUSTERED COLUMNSTORE INDEX ccx_yellow_trips ON dbo.tripdata
 
 
 -- First six years, with no surcharge data:
-INSERT INTO dbo.tripdata(
+INSERT INTO yellow.tripdata(
 	vendor_code,
 	trip_pickup_datetime,
 	trip_dropoff_datetime,
@@ -169,7 +94,7 @@ FROM dbo.tripdata_0914
 
 
 -- 2015 onwards, we have surcharge data:
-INSERT INTO dbo.tripdata(
+INSERT INTO yellow.tripdata(
 	vendor_code,
 	trip_pickup_datetime,
 	trip_dropoff_datetime,
@@ -231,38 +156,28 @@ SELECT -- top 2000000
 FROM dbo.tripdata_1516
 
 ------------------Updates--------------
+-- Re-create the foreign keys
+ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_vendor       FOREIGN KEY (vendor_code) REFERENCES yellow.d_vendor_codes
+ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_rate         FOREIGN KEY (rate_code) REFERENCES yellow.d_rate_codes
+ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_store_fwd    FOREIGN KEY (store_and_forward_code) REFERENCES yellow.d_store_and_forward_codes
+ALTER TABLE yellow.tripdata ADD CONSTRAINT fk_payment_type FOREIGN KEY (payment_type_code) REFERENCES yellow.d_payment_type_codes
 
-ALTER TABLE dbo.tripdata ADD CONSTRAINT fk_vendor       FOREIGN KEY (vendor_code) REFERENCES dbo.d_vendor_codes
-ALTER TABLE dbo.tripdata ADD 	CONSTRAINT fk_rate         FOREIGN KEY (rate_code) REFERENCES dbo.d_rate_codes
-ALTER TABLE dbo.tripdata ADD CONSTRAINT fk_store_fwd    FOREIGN KEY (store_and_forward_code) REFERENCES dbo.d_store_and_forward_codes
-ALTER TABLE dbo.tripdata ADD CONSTRAINT fk_payment_type FOREIGN KEY (payment_type_code) REFERENCES dbo.d_payment_type_codes
+-- Turn any physically impossible values remaining into NULL. Note that ones that don't fit with the datatype (eg longitude with more than 3 digits to left of decimal point)
+-- will already have become NULL in the process above
+UPDATE yellow.tripdata SET start_lon = NULL, start_lat = NULL WHERE ABS(start_lon) > 180 OR start_lon = 0
+UPDATE yellow.tripdata SET end_lon = NULL, end_lat = NULL WHERE ABS(end_lon) > 180 OR end_lon = 0
+UPDATE yellow.tripdata SET start_lat = NULL, start_lon = NULL WHERE ABS(start_lat) > 90 OR start_lat = 0
+UPDATE yellow.tripdata SET end_lat = NULL, end_lon = NULL WHERE ABS(end_lat) > 90 OR end_lat = 0
+UPDATE yellow.tripdata SET trip_distance = NULL WHERE trip_distance <= 0
+UPDATE yellow.tripdata SET passenger_count = NULL WHERE passenger_count < 1
+UPDATE yellow.tripdata SET fare_amt = NULL WHERE fare_amt <= 0
+UPDATE yellow.tripdata SET surcharge = NULL WHERE surcharge < 0
+UPDATE yellow.tripdata SET tip_amt = NULL WHERE tip_amt < 0
+UPDATE yellow.tripdata SET improvement_surcharge = NULL WHERE improvement_surcharge < 0
+UPDATE yellow.tripdata SET total_amt = NULL WHERE total_amt <= 0
 
-UPDATE dbo.tripdata SET start_lon = NULL, start_lat = NULL WHERE ABS(start_lon) > 180
-UPDATE dbo.tripdata SET end_lon = NULL, end_lat = NULL WHERE ABS(end_lon) > 180
-UPDATE dbo.tripdata SET start_lat = NULL, start_lon = NULL WHERE ABS(start_lat) > 90
-UPDATE dbo.tripdata SET end_lat = NULL, end_lon = NULL WHERE ABS(end_lat) > 90
-UPDATE dbo.tripdata SET trip_distance = NULL WHERE trip_distance < 0
-UPDATE dbo.tripdata SET passenger_count = NULL WHERE passenger_count < 1
-UPDATE dbo.tripdata SET fare_amt = NULL WHERE fare_amt < 0
-UPDATE dbo.tripdata SET surcharge = NULL WHERE surcharge < 0
-UPDATE dbo.tripdata SET tip_amt = NULL WHERE tip_amt < 0
-UPDATE dbo.tripdata SET improvement_surcharge = NULL WHERE improvement_surcharge < 0
-UPDATE dbo.tripdata SET total_amt = NULL WHERE total_amt < 0
-
-ALTER INDEX ccx_yellow_trips ON dbo.tripdata REORGANIZE with (COMPRESS_ALL_ROW_GROUPS = ON)  
-----------------Transfer-------------------------
--- if everything works can now transfer over to the production databases and drop the temporary versions of the data
-DROP TABLE IF EXISTS yellow.tripdata
-DROP TABLE IF EXISTS yellow.d_payment_type_codes
-DROP TABLE IF EXISTS yellow.d_store_and_forward_codes
-DROP TABLE IF EXISTS yellow.d_rate_codes
-DROP TABLE IF EXISTS yellow.d_vendor_codes
-ALTER SCHEMA yellow TRANSFER dbo.d_payment_type_codes
-ALTER SCHEMA yellow TRANSFER dbo.d_store_and_forward_codes
-ALTER SCHEMA yellow TRANSFER dbo.d_rate_codes
-ALTER SCHEMA yellow TRANSFER dbo.d_vendor_codes
-ALTER SCHEMA yellow TRANSFER dbo.tripdata
-
+-- Reorganise the columnstore index
+ALTER INDEX ccx_yellow_trips ON yellow.tripdata REORGANIZE with (COMPRESS_ALL_ROW_GROUPS = ON)  
 
 
 /*
@@ -270,6 +185,6 @@ ALTER SCHEMA yellow TRANSFER dbo.tripdata
 DROP TABLE dbo.tripdata_0914
 DROP TABLE dbo.tripdata_1516
 
--- you *might* want to now shrink the database and rebuild the indexes. This is a rare situation when it makes sense I think.
+-- and then you *might* want to now shrink the database and rebuild the indexes. This is a rare situation when it makes sense I think.
 
 */

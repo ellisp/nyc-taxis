@@ -26,22 +26,29 @@ system.time({
       sql <- paste0("INSERT INTO dbo.tripdata_log (filename) VALUES ('", f, "')")
       dbGetQuery(nyc_taxi, sql)
       
-      if(grepl("_2015-", f, fixed = TRUE)){
+      if(grepl("_2015-", f, fixed = TRUE) | grepl("2016\\-0[1-6]", f)){
         bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_1516", 
             file = f, 
             delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 6000") 
       } else {
-        bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_0914", 
-            file = f, 
-            delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 6000")
+        if(grepl("\\_201[6-9]", f)) {
+          bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_1619", 
+              file = f, 
+              delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 6000")
+        } else {
+          
+          bcp("localhost", database = "nyc_taxi", schema = "dbo", table = "tripdata_0914", 
+              file = f, 
+              delim = ",", verbose = TRUE, extra_args = " -F 3 -b 1000000 -m 6000")
+        }
       }
     }
-  
   }
 })
 
 
 # I expect this next script to take quite a few hours to run, so rather than uncommenting it
 # you might prefer to do it in Management Studio
+# execute_sql(nyc_taxi, "processing/one-off-setup-target.sql")
 # execute_sql(nyc_taxi, "processing/staging-to-target.sql")
 

@@ -14,7 +14,7 @@ source("setup.R")
 while(TRUE){
   
   core_url <- "https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_YYYY-MM.csv"
-  all_years <- 2009:2015
+  all_years <- 2015:2019
   all_months <- str_pad(1:12, 2, "left", pad = "0")
   
   for(y in all_years){
