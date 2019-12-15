@@ -47,8 +47,6 @@ system.time({
 })
 
 
-x <- read_csv(f, n_max = 1e4)
-na
 
 source("processing/one-off-setup-target.R")
 

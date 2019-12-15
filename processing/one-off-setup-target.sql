@@ -1,11 +1,11 @@
-
+/*
 DROP TABLE IF EXISTS yellow.tripdata
 DROP TABLE IF EXISTS yellow.d_vendor_codes
 DROP TABLE IF EXISTS yellow.d_rate_codes
 DROP TABLE IF EXISTS yellow.d_store_and_forward_codes
 DROP TABLE IF EXISTS yellow.d_payment_type_codes
 DROP TABLE IF EXISTS yellow.d_taxi_zone_codes
-
+*/
 -- Target dimension tables
 
 CREATE TABLE yellow.d_vendor_codes (
