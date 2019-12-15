@@ -15,7 +15,12 @@ Peter Ellis 14 December 2019
 13 million rows in 2 minutes, fk after upload, 6 try_cast operations
 13 million rows in 2 minutes, fk after upload, 13 try_cast operations
 
-Note that some of the arithmetic overflow errors are from excessivley large negative figures eg -20m in the total fare.
+# When the staging tables are much bigger, things are much slower:
+2 million rows in 4 minutes (maybe things were asleep?)
+8 million rows in 2 minutes
+16 million rows in 4 minutes
+
+Note that some of the arithmetic overflow errors in earlier versions were from excessively large negative figures eg -20m in the total fare.
 It is easy to forget this is possible when troubleshooting!
 */
 
@@ -51,7 +56,7 @@ INSERT INTO yellow.tripdata(
 	tolls_amt,
 	total_amt
 )
-SELECT top 2000
+SELECT --top 8000000
 	CASE
 		WHEN vendor_name = '1' THEN 'CMT'
 		WHEN vendor_name = '2' THEN 'VTS'
@@ -117,7 +122,7 @@ INSERT INTO yellow.tripdata(
 	improvement_surcharge,
 	total_amt
 )
-SELECT -- top 2000000
+SELECT --top 8000000
     CASE
 		WHEN vendor_name = '1' THEN 'CMT'
 		WHEN vendor_name = '2' THEN 'VTS'
@@ -178,7 +183,7 @@ INSERT INTO yellow.tripdata(
 	pickup_zone_code,
 	dropoff_zone_code
 )
-SELECT -- top 2000000
+SELECT --top 4000000
     CASE
 		WHEN vendor_name = '1' THEN 'CMT'
 		WHEN vendor_name = '2' THEN 'VTS'
@@ -240,7 +245,7 @@ ALTER INDEX ccx_yellow_trips ON yellow.tripdata REORGANIZE with (COMPRESS_ALL_RO
 
 
 /*
--- if you're really sure it's all ok you might want to delete the staging tables to save space:
+-- if you're really sure it's all ok you *might* want to delete the staging tables to save space:
 DROP TABLE dbo.tripdata_0914
 DROP TABLE dbo.tripdata_1516
 DROP TABLE dbo.tripdata_1619

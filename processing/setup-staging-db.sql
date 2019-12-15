@@ -4,6 +4,7 @@ USE nyc_taxi
 
 DROP TABLE IF EXISTS dbo.tripdata_0914
 DROP TABLE IF EXISTS dbo.tripdata_1516
+DROP TABLE IF EXISTS dbo.tripdata_1619
 DROP TABLE IF EXISTS dbo.tripdata_log
 GO
 
