@@ -48,9 +48,9 @@ system.time({
 
 
 
-source("processing/one-off-setup-target.R")
+# source("processing/one-off-setup-target.R")
 
 # I expect this next script to take quite a few hours to run, so rather than uncommenting it
 # you might prefer to do it in Management Studio
-execute_sql(nyc_taxi, "processing/staging-to-target.sql")
+# execute_sql(nyc_taxi, "processing/staging-to-target.sql")
 
