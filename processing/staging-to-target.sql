@@ -56,7 +56,7 @@ INSERT INTO yellow.tripdata(
 	tolls_amt,
 	total_amt
 )
-SELECT --top 8000000
+SELECT 
 	CASE
 		WHEN vendor_name = '1' THEN 'CMT'
 		WHEN vendor_name = '2' THEN 'VTS'
@@ -122,7 +122,7 @@ INSERT INTO yellow.tripdata(
 	improvement_surcharge,
 	total_amt
 )
-SELECT --top 8000000
+SELECT 
     CASE
 		WHEN vendor_name = '1' THEN 'CMT'
 		WHEN vendor_name = '2' THEN 'VTS'
@@ -162,7 +162,7 @@ SELECT --top 8000000
 	TRY_CAST(total_amt AS DECIMAL(9, 2))
 FROM dbo.tripdata_1516
 
-
+/*
 -- mid 2016 onwards we no longer have lat and long:
 INSERT INTO yellow.tripdata(
 	vendor_code,
@@ -222,7 +222,7 @@ SELECT --top 4000000
 	pu_location_id,
 	do_location_id
 FROM dbo.tripdata_1619
-
+*/
 
 ------------------Updates--------------
 -- Re-create the foreign keys

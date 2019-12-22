@@ -21,9 +21,9 @@ GO
 SELECT
 	count(1) as freq,
 	passenger_count,
-	vendor_name
-FROM yellow.tripdata _filtered
-GROUP BY vendor_name, passenger_count
+	vendor_code
+FROM yellow.tripdata_filtered
+GROUP BY vendor_code, passenger_count
 ORDER BY passenger_count DESC
 
 
@@ -61,8 +61,8 @@ GO
 CREATE VIEW yellow.tripdata_filtered AS 
 	(SELECT 
 		*,
-		trip_duration_min = DATEDIFF(minute, trip_pickup_datetime, trip_dropoff_datetime),
-		trip_speed_mph = trip_distance / DATEDIFF(hour, trip_pickup_datetime, trip_dropoff_datetime)
+		trip_duration_min = DATEDIFF(minute, trip_dropoff_datetime, trip_pickup_datetime),
+		trip_speed_mph = trip_distance / DATEDIFF(hour, trip_dropoff_datetime, trip_pickup_datetime)
 	 FROM yellow.tripdata
 	 WHERE start_lon > -74.05 AND start_lon < -73.75 AND
 		   start_lat > 40.58 AND start_lat < 40.90 AND
